@@ -18,6 +18,14 @@ def scaler(X):
             
     return X_scaled
 
+def handleMissingValues(df):
+    # Handling missing values by filling with the median
+    for col in df.columns:
+        if df[col].isnull().any():
+            if pd.api.types.is_numeric_dtype(df[col]):
+                median_val = df[col].median()
+                df[col] = df[col].fillna(median_val)
+
 # Loads and preprocesses the life expectancy data.
 def preprocess_data(data_path):    
     # Load data
@@ -29,14 +37,10 @@ def preprocess_data(data_path):
     # Dropping the 'Country' column as it's an identifier and a string.
     df = df.drop('Country', axis=1)
 
-    # Handling missing values by filling with the median
-    for col in df.columns:
-        if df[col].isnull().any():
-            if pd.api.types.is_numeric_dtype(df[col]):
-                median_val = df[col].median()
-                df[col] = df[col].fillna(median_val)
+    # Handling missing values
+    handleMissingValues(df)
 
-    # Turning the 'Status' variable into int
+    # Turning the 'status' variable into int
     df['Status'] = df['Status'].apply(lambda x: 1 if x == 'Developed' else 0)
 
     # Separate features (X) and target (y)
